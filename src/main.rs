@@ -128,17 +128,9 @@ fn main() {
             .map_or(std::ptr::null(), |f| f as *const _)
     });
 
-    let positions: Vec<f32> = vec![
-        // First triangle for square
-        -0.5, -0.5,
-        0.5, -0.5,
-        0.5, 0.5,
+    let positions: Vec<f32> = vec![-0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5];
 
-        // Second triangle for square
-        0.5, 0.5,
-        -0.5, 0.5,
-        -0.5, -0.5
-    ];
+    let indices: Vec<u32> = vec![0, 1, 2, 2, 3, 0];
 
     let shader: u32;
     unsafe {
@@ -160,6 +152,16 @@ fn main() {
         gl::EnableVertexAttribArray(0);
         gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, std::ptr::null());
 
+        let mut ibo: u32 = 0;
+        gl::GenBuffers(1, &mut ibo);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ibo);
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (indices.len() * std::mem::size_of::<u32>()) as isize,
+            indices.as_ptr() as *const _,
+            gl::STATIC_DRAW,
+        );
+
         let source = read_shader_source("resources/shaders/basic.shader");
         shader = create_shader(&source.vertex_source, &source.fragment_source);
         gl::UseProgram(shader);
@@ -172,7 +174,7 @@ fn main() {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            gl::DrawArrays(gl::TRIANGLES, 0, 6);
+            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, std::ptr::null());
         }
 
         window.swap_buffers();
