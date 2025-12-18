@@ -116,7 +116,7 @@ fn main() {
     glfw.window_hint(glfw::WindowHint::ContextVersion(4, 6));
 
     let (mut window, events) = glfw
-        .create_window(800, 600, "OpenGL", glfw::WindowMode::Windowed)
+        .create_window(600, 600, "OpenGL", glfw::WindowMode::Windowed)
         .expect("Failed to create GLFW window");
 
     window.make_current();
@@ -128,10 +128,16 @@ fn main() {
             .map_or(std::ptr::null(), |f| f as *const _)
     });
 
-    let positions: [f32; 6] = [
-        -0.5, -0.5, // Bottom-left
-        0.5, -0.5, // Bottom-right
-        0.0, 0.5, // Top-center
+    let positions: Vec<f32> = vec![
+        // First triangle for square
+        -0.5, -0.5,
+        0.5, -0.5,
+        0.5, 0.5,
+
+        // Second triangle for square
+        0.5, 0.5,
+        -0.5, 0.5,
+        -0.5, -0.5
     ];
 
     let shader: u32;
@@ -159,14 +165,14 @@ fn main() {
         gl::UseProgram(shader);
 
         println!("Shader program: {}", shader);
-        gl::Viewport(0, 0, 800, 600);
+        gl::Viewport(0, 0, 600, 600);
     }
 
     while !window.should_close() {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            gl::DrawArrays(gl::TRIANGLES, 0, 3);
+            gl::DrawArrays(gl::TRIANGLES, 0, 6);
         }
 
         window.swap_buffers();
